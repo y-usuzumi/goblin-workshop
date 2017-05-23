@@ -4,18 +4,12 @@ module Goblin.Workshop.Workshop
   ) where
 
 import           Data.Graph
-import           Goblin.Workshop.Task          (AnyTask)
+import           Goblin.Workshop.Task          (AnyTask, TaskId)
 import           Goblin.Workshop.TaskResult    (UnifiedTaskResult)
-import           Goblin.Workshop.TaskScheduler (AnyTaskScheduler)
+import           Goblin.Workshop.TaskScheduler
 
-type TaskTable m = Table (AnyTask m)
+type TaskTable m = Table (TaskId, AnyTask m)
 
 data Workshop m = Workshop { graph     :: Graph
                            , taskTable :: TaskTable m
                            }
-
-run :: (Monad m, Traversable t)
-    => Workshop mtask
-    -> AnyTaskScheduler t mrunner mtask
-    -> m [UnifiedTaskResult]
-run Workshop{..} = undefined
