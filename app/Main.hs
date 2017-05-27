@@ -1,6 +1,6 @@
 module Main where
 
-import Lib
+import           Goblin.Workshop
 
 main :: IO ()
-main = someFunc
+main = run undefined

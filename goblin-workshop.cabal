@@ -15,7 +15,8 @@ cabal-version:       >=1.10
 
 library
   hs-source-dirs:      src
-  exposed-modules:     Goblin.Workshop.Bus
+  exposed-modules:     Goblin.Workshop
+                     , Goblin.Workshop.Bus
                      , Goblin.Workshop.Bus.Dispatcher
                      , Goblin.Workshop.Bus.Scheduler
                      , Goblin.Workshop.Bus.Task
@@ -23,7 +24,6 @@ library
                      , Goblin.Workshop.Result
                      , Goblin.Workshop.Scheduler
                      , Goblin.Workshop.Workshop
-                     , Lib
   build-depends:       base >= 4.7 && < 5
                      , async
                      , containers
