@@ -16,16 +16,19 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Goblin.Workshop.Bus
+                     , Goblin.Workshop.Bus.Dispatcher
+                     , Goblin.Workshop.Bus.Scheduler
+                     , Goblin.Workshop.Bus.Task
                      , Goblin.Workshop.Task
-                     , Goblin.Workshop.TaskResult
-                     , Goblin.Workshop.TaskRunner
-                     , Goblin.Workshop.TaskScheduler
+                     , Goblin.Workshop.Result
+                     , Goblin.Workshop.Scheduler
                      , Goblin.Workshop.Workshop
                      , Lib
   build-depends:       base >= 4.7 && < 5
                      , async
                      , containers
                      , mtl
+                     , stm
   default-language:    Haskell2010
   default-extensions:  ExistentialQuantification
                      , FlexibleInstances

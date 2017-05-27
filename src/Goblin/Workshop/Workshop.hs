@@ -1,14 +1,9 @@
-module Goblin.Workshop.Workshop
-  ( AnyTask (..)
-  , Workshop (..)
-  ) where
+module Goblin.Workshop.Workshop where
 
 import           Data.Graph
-import           Goblin.Workshop.Task          (AnyTask, TaskId)
-import           Goblin.Workshop.TaskResult    (UnifiedTaskResult)
-import           Goblin.Workshop.TaskScheduler
+import           Goblin.Workshop.Task
 
-type TaskTable m = Table (TaskId, AnyTask m)
+type TaskTable m = Table (TaskId, Task m)
 
 data Workshop m = Workshop { graph     :: Graph
                            , taskTable :: TaskTable m
