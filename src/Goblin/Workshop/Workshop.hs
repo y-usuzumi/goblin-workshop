@@ -1,7 +1,12 @@
 module Goblin.Workshop.Workshop where
 
+import           Control.Concurrent
 import           Control.Concurrent.STM
+import           Control.Monad
 import           Data.Graph
+import           Goblin.Workshop.Bus.Dispatcher as DBus
+import           Goblin.Workshop.Bus.Scheduler as SBus
+import           Goblin.Workshop.Bus.Task as TBus
 import           Goblin.Workshop.Dispatcher
 import           Goblin.Workshop.Scheduler
 import           Goblin.Workshop.Task
@@ -14,8 +19,9 @@ data Workshop m = Workshop { graph     :: Graph
 
 run :: Workshop m -> IO ()
 run _ = do
-  dispatcherBus <- atomically dispatcherBus
+  dispatcherBus <- atomically newDispatcherBus
   schedulerBus <- atomically newSchedulerBus
   taskBus <- atomically newTaskBus
-  runDispatcher dispatcherBus defaultDispatcher
-  putStrLn "Hello world"
+  forkIO $ runDispatcher defaultDispatcher dispatcherBus
+  forkIO $ runScheduler defaultScheduler schedulerBus
+  forever $ threadDelay 300000000

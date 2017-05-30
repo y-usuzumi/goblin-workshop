@@ -1,19 +1,20 @@
 module Goblin.Workshop.Dispatcher where
 
+import           Control.Concurrent.STM
 import           Control.Monad
 import           Goblin.Workshop.Bus.Dispatcher
 
 newtype Dispatcher m =
-  Scheduler { runDispatcher :: Monad m => DispatcherBus -> m ()
+  Dispatcher { runDispatcher :: Monad m => DispatcherBus -> m ()
             }
 
-defaultDispatcher :: DispatcherBus -> IO ()
-defaultDispatcher bus = do
-  atomically $ do
-    writeTChan bus (Debug "Hello world")
+defaultDispatcher :: Dispatcher IO
+defaultDispatcher = Dispatcher $ \bus -> do
+  putStrLn "Dispatcher launched"
   listen bus
   where
     listen bus = forever $ do
-      msg <- readTChan bus
+      msg <- atomically $ readTChan bus
       case msg of
-        Debug s -> putStrLn "GG"
+        Debug s -> putStrLn s
+        otherwise -> error "Not implemented yet"

@@ -20,9 +20,10 @@ library
                      , Goblin.Workshop.Bus.Dispatcher
                      , Goblin.Workshop.Bus.Scheduler
                      , Goblin.Workshop.Bus.Task
-                     , Goblin.Workshop.Task
+                     , Goblin.Workshop.Dispatcher
                      , Goblin.Workshop.Result
                      , Goblin.Workshop.Scheduler
+                     , Goblin.Workshop.Task
                      , Goblin.Workshop.Workshop
   build-depends:       base >= 4.7 && < 5
                      , async
