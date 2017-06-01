@@ -1,8 +1,13 @@
 module Goblin.Workshop.Workshop where
 
-import           Data.Map              as M
+import           Control.Arrow
+import           Control.Monad
+import           Data.List
+import qualified Data.Map               as M
 import           Goblin.Workshop.Graph
+import           Goblin.Workshop.Result
 import           Goblin.Workshop.Task
+import           Text.Printf
 
 newtype Workshop m = Workshop { graph :: Graph TaskId (Task m)
                               }
@@ -24,3 +29,23 @@ removeAvailableTask tid = Workshop . removeEntryPoint tid . graph
 
 removeAvailableTasks :: [TaskId] -> Workshop m -> Workshop m
 removeAvailableTasks tids = Workshop . removeEntryPoints tids . graph
+
+createTasks :: Monad m => [m Result] -> [UniqueTask m]
+createTasks = createTasksWithIds . zip [1..]
+
+createTasksWithIds :: Monad m => [(TaskId, m Result)] -> [UniqueTask m]
+createTasksWithIds = map (second Task)
+
+describeWorkshop :: Workshop m -> IO ()
+describeWorkshop w = do
+  printf "/==========\n"
+  let g = graph w
+  let tasks = M.assocs $ vertices g
+  let inEdges = inEdgesMap g
+  printf "| Total %d tasks\n" (length tasks)
+  forM_ tasks $ \(tid, _) -> do
+    let deps = inEdges M.! tid
+    case deps of
+      [] -> printf "|   - %d\n" tid
+      _ -> printf "|   - %d (dependent on %s)\n" tid (intercalate ", " (map show deps))
+  printf "\\==========\n"
