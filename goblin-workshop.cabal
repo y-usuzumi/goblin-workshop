@@ -19,7 +19,6 @@ library
                      , Goblin.Workshop.Bus
                      , Goblin.Workshop.Bus.Dispatcher
                      , Goblin.Workshop.Bus.Scheduler
-                     , Goblin.Workshop.Bus.Task
                      , Goblin.Workshop.Dispatcher
                      , Goblin.Workshop.Graph
                      , Goblin.Workshop.Result
@@ -39,6 +38,7 @@ library
                      , KindSignatures
                      , MultiParamTypeClasses
                      , NamedFieldPuns
+                     , PolyKinds
                      , RankNTypes
                      , RecordWildCards
 

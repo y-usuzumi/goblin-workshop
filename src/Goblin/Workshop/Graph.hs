@@ -1,6 +1,5 @@
 module Goblin.Workshop.Graph where
 
-import Debug.Trace
 import Data.List
 import Control.Monad.ST
 import qualified Data.Map as M
@@ -29,6 +28,7 @@ initGraph kvps conns = Graph { vertices
   reducer (outEdges, inEdges) curr = let
     start = fst curr
     end = snd curr
+    -- TODO: Check for existence of start and end
     outEdgesMap' = M.adjust ( \ existing ->
                                 reverse (end:reverse existing)
                             ) start outEdges

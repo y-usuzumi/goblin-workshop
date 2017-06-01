@@ -3,17 +3,18 @@ module Goblin.Workshop.Bus.Scheduler where
 import           Control.Concurrent.STM
 import           Control.Concurrent.STM.TChan
 import           Goblin.Workshop.Result       (Result)
-import           Goblin.Workshop.Task         (TaskId)
+import           Goblin.Workshop.Task
 
-data SchedulerMessage = SpawnTask TaskId
-                      | KillTask TaskId
-                      | QueryState TaskId
-                      | TaskDone TaskId Result
-                      | TaskError TaskId
-                      | TaskOutput TaskId String
-                      | Debug String
+data SchedulerMessage m = SSpawnTask (UniqueTask m)
+                        | SKillTask TaskId
+                        | SQueryState TaskId
+                        | STaskDone TaskId Result
+                        | STaskError TaskId
+                        | STaskOutput TaskId String
+                        | SDebug String
+                        | SFin
 
-type SchedulerBus = TChan SchedulerMessage
+type SchedulerBus m = TChan (SchedulerMessage m)
 
-newSchedulerBus :: STM SchedulerBus
+newSchedulerBus :: STM (SchedulerBus m)
 newSchedulerBus = newTChan
