@@ -1,52 +1,36 @@
-{-# LANGUAGE ScopedTypeVariables #-}
-
 module Goblin.Workshop.Graph where
 
-import           Control.Arrow
-import           Control.Monad
-import           Control.Monad.ST
-import           Data.List
-import qualified Data.Map            as M
-import           Data.STRef
-import qualified Data.Vector         as V
-import qualified Data.Vector.Mutable as MV
+import Data.List
+import Control.Monad.ST
+import qualified Data.Map as M
 
-data Graph i a = Graph { vertices :: V.Vector a
-                       , edges    :: V.Vector [Int]  -- Unidirectional index to index
-                       , iamap    :: M.Map i Int
+type Vertices i a = M.Map i a
+type Edges i = M.Map i (Int, [i])  -- (indegree, outnodes)
+
+data Graph i a = Graph { vertices :: Vertices i a
+                       , edges :: Edges i
                        }
 
-connect :: Ord i => Graph i a -> i -> i -> Graph i a
-connect g@Graph{..} sp ep = let
-  spIdx = iamap M.! sp
-  epIdx = iamap M.! ep
-  -- See https://ghc.haskell.org/trac/ghc/wiki/ImpredicativePolymorphism
-  -- Due to no support for impredicative polymorphism
-  -- I can't write `flip V.modify edges $ \mv -> ...`
-  -- Basically one can't put a `forall` polymorphism type on a type variable
-  edges' = V.modify (\mv -> MV.modify mv (epIdx:) spIdx) edges
-  in
-  g { edges=edges' }
-
 initGraph :: Ord i
-          => V.Vector (i, a)  -- (key, value) pairs
-          -> V.Vector (i, i)  -- (start, end) unidirections
+          => [(i, a)]  -- (key, value) pairs
+          -> [(i, i)]  -- (start, end) unidirections
           -> Graph i a
-initGraph kvps connections = let
-  vertices = V.map snd kvps
-  iamap = M.fromList $ zip (V.toList $ V.map fst kvps) [0..]
-  edges = runST $ do
-    medges <- MV.replicate (V.length kvps) []
-    flip mapM_ connections $ \(start, end) -> do
-      let startIdx = iamap M.! start
-          endIdx = iamap M.! end
-      MV.modify medges (endIdx:) startIdx
-    V.freeze medges
-  in Graph { vertices
-           , edges
-           , iamap
-           }
+initGraph kvps conns = Graph { vertices
+                             , edges
+                             } where
+  emptyMap keys defVal = M.fromList $ map (\k -> (k, defVal)) keys
+  vertices = M.fromList kvps
+  edges = foldl' reducer (emptyMap (M.keys vertices) (0, [])) conns
+  reducer acc curr = let
+    start = fst curr
+    end = snd curr
+    in
+    M.alter (\ends -> case ends of
+                        Nothing -> Just (1, [snd curr])
+                        Just (indegree, existing) -> Just (indegree+1, snd curr:existing)
+            ) start acc
 
 entryPoints :: Ord i => Graph i a -> [(i, a)]
-entryPoints g@Graph{..} = map (second (vertices V.!)) $ flip filter (M.assocs iamap) $ \(i, idx) ->
-  null $ edges V.! idx
+entryPoints g@Graph{..} = M.assocs entries where
+  entries = flip M.filterWithKey vertices $ \i a ->
+    fst (edges M.! i) == 0
