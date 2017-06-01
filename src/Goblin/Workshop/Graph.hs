@@ -1,18 +1,19 @@
 {-# LANGUAGE ScopedTypeVariables #-}
-{-# LANGUAGE ImpredicativeTypes #-}
 
 module Goblin.Workshop.Graph where
 
-import Data.STRef
-import Control.Monad
-import Control.Monad.ST
-import qualified Data.Map as M
-import qualified Data.Vector as V
+import           Control.Arrow
+import           Control.Monad
+import           Control.Monad.ST
+import           Data.List
+import qualified Data.Map            as M
+import           Data.STRef
+import qualified Data.Vector         as V
 import qualified Data.Vector.Mutable as MV
 
 data Graph i a = Graph { vertices :: V.Vector a
-                       , edges :: V.Vector [Int]  -- Unidirectional index to index
-                       , iamap :: M.Map i Int
+                       , edges    :: V.Vector [Int]  -- Unidirectional index to index
+                       , iamap    :: M.Map i Int
                        }
 
 connect :: Ord i => Graph i a -> i -> i -> Graph i a
@@ -45,3 +46,7 @@ initGraph kvps connections = let
            , edges
            , iamap
            }
+
+entryPoints :: Ord i => Graph i a -> [(i, a)]
+entryPoints g@Graph{..} = map (second (vertices V.!)) $ flip filter (M.assocs iamap) $ \(i, idx) ->
+  null $ edges V.! idx
