@@ -16,26 +16,33 @@ tasks = createTasksWithIds [ (1, printA)
                            , (2, printB)
                            , (3, printC)
                            , (4, printD)
+                           , (5, printE)
                            ]
   where
-    printX interval totalTime s = printX_ interval 0 totalTime s
+    printX interval totalTime s = do
+      printf "> Starting %s\n" s
+      printX_ interval 0 totalTime s
     printX_ interval currTime totalTime s
       | currTime >= totalTime = do
-          return $ ok $ printf "%s is Done!" s
+          printf "< Stopping %s\n" s
+          return $ ok $ "OK"
       | otherwise = do
-          let period = interval * 1000000
-          printf "%s is working\n" s
+          let period = floor $ interval * fromIntegral 1000000
+          printf "* %s is working\n" s
           threadDelay period
           printX_ interval (currTime + interval) totalTime s
     printA = printX 2 10 "Task 1"
     printB = printX 3 6 "Task 2"
     printC = printX 2 10 "Task 3"
     printD = printX 2 6 "Task 4"
+    printE = printX 0.5 2 "Task 5"
 
 dependencies :: [(TaskId, TaskId)]
 dependencies = [ (1, 3)
                , (2, 3)
                , (2, 4)
+               , (3, 5)
+               , (4, 5)
                ]
 
 updateLogger :: IO ()

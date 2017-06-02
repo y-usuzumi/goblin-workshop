@@ -48,6 +48,6 @@ defaultDispatcher = Dispatcher $ \workshop dbus sbus -> do
         if (not . null) runningTasks
           then listen workshop dbus sbus
           else do
-          infoM "gw.d" "All tasks are done. Terminating scheduler"
+          infoM "gw.d" "All tasks are done. Asking scheduler to terminate"
           atomically $ writeTChan sbus SFin
           infoM "gw.d" "Bye"
