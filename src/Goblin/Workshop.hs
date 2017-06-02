@@ -1,30 +1,44 @@
 module Goblin.Workshop
-  ( run
-  , module R
-  , module T
-  , module W
+  ( buildWorkshop
+  , createTasks
+  , createTasksWithIds
+  , describeWorkshop
+  , ok
+  , err
+  , isOk
+  , isErr
+  , run
+  , newWorkshopBus
+  , Result
+  , Task (..)
+  , TaskId
+  , TaskMessage (..)
+  , UniqueTask
+  , WorkshopBus
+  , WorkshopMessage (..)
+  , WTaskState (..)
+  , WTaskTalk (..)
   ) where
 
 import           Control.Concurrent
 import           Control.Concurrent.STM
 import           Control.Concurrent.STM.TChan
 import           Control.Monad
-import           Goblin.Workshop.Bus.Dispatcher
-import           Goblin.Workshop.Bus.Scheduler
 import           Goblin.Workshop.Dispatcher
-import           Goblin.Workshop.Result         as R
 import           Goblin.Workshop.Scheduler
-import           Goblin.Workshop.Task           as T
-import           Goblin.Workshop.Workshop       as W
+import           Goblin.Workshop.Types
+import           Goblin.Workshop.Util
+import           Goblin.Workshop.Workshop
 import           System.Log.Logger
 
-run :: Workshop IO -> IO ()
-run workshop = do
+run :: Workshop IO -> Maybe (TChan WorkshopMessage) -> IO ()
+run workshop wbus = do
+  atomically $ writeMaybeTChan wbus WStart
   termMVar <- newEmptyMVar
   dispatcherBus <- atomically newDispatcherBus
   schedulerBus <- atomically newSchedulerBus
-  safeFork termMVar $ runScheduler defaultScheduler schedulerBus dispatcherBus
-  safeFork termMVar $ runDispatcher defaultDispatcher workshop dispatcherBus schedulerBus
+  safeFork termMVar $ runScheduler defaultScheduler schedulerBus dispatcherBus wbus
+  safeFork termMVar $ runDispatcher defaultDispatcher workshop dispatcherBus schedulerBus wbus
   takeMVar termMVar
   takeMVar termMVar
   where

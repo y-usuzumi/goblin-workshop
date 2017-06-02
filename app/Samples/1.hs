@@ -31,11 +31,11 @@ tasks = createTasksWithIds [ (1, printA)
           printf "* %s is working\n" s
           threadDelay period
           printX_ interval (currTime + interval) totalTime s
-    printA = printX 2 10 "Task 1"
-    printB = printX 3 6 "Task 2"
-    printC = printX 2 10 "Task 3"
-    printD = printX 2 6 "Task 4"
-    printE = printX 0.5 2 "Task 5"
+    printA = Task $ printX 2 10 "Task 1"
+    printB = Task $ printX 3 6 "Task 2"
+    printC = Task $ printX 2 10 "Task 3"
+    printD = Task $ printX 2 6 "Task 4"
+    printE = Task $ printX 0.5 2 "Task 5"
 
 dependencies :: [(TaskId, TaskId)]
 dependencies = [ (1, 3)
@@ -58,4 +58,4 @@ main = do
   updateLogger
   let workshop = buildWorkshop tasks dependencies
   describeWorkshop workshop
-  run workshop
+  run workshop Nothing

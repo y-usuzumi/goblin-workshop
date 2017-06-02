@@ -16,14 +16,12 @@ cabal-version:       >=1.10
 library
   hs-source-dirs:      src
   exposed-modules:     Goblin.Workshop
-                     , Goblin.Workshop.Bus
-                     , Goblin.Workshop.Bus.Dispatcher
-                     , Goblin.Workshop.Bus.Scheduler
                      , Goblin.Workshop.Dispatcher
                      , Goblin.Workshop.Graph
                      , Goblin.Workshop.Result
                      , Goblin.Workshop.Scheduler
-                     , Goblin.Workshop.Task
+                     , Goblin.Workshop.Types
+                     , Goblin.Workshop.Util
                      , Goblin.Workshop.Workshop
   build-depends:       base >= 4.7 && < 5
                      , async
@@ -61,8 +59,13 @@ executable goblin-workshop-sample-2
                      , brick
                      , containers
                      , hslogger
+                     , mtl
+                     , stm
                      , vty
   default-language:    Haskell2010
+  default-extensions:  MultiWayIf
+                     , NamedFieldPuns
+                     , RecordWildCards
                        
 test-suite goblin-workshop-test
   type:                exitcode-stdio-1.0

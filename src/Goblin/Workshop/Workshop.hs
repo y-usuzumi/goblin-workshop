@@ -1,16 +1,17 @@
 module Goblin.Workshop.Workshop where
 
 import           Control.Arrow
+import           Control.Concurrent.STM
+import           Control.Concurrent.STM.TChan
 import           Control.Monad
 import           Data.List
-import qualified Data.Map               as M
+import qualified Data.Map                     as M
 import           Goblin.Workshop.Graph
-import           Goblin.Workshop.Result
-import           Goblin.Workshop.Task
+import           Goblin.Workshop.Types
 import           Text.Printf
 
-newtype Workshop m = Workshop { graph :: Graph TaskId (Task m)
-                              }
+newWorkshopBus :: STM WorkshopBus
+newWorkshopBus = newTChan
 
 buildWorkshop :: Monad m
               => [(TaskId, Task m)]
@@ -30,11 +31,11 @@ removeAvailableTask tid = Workshop . removeEntryPoint tid . graph
 removeAvailableTasks :: [TaskId] -> Workshop m -> Workshop m
 removeAvailableTasks tids = Workshop . removeEntryPoints tids . graph
 
-createTasks :: Monad m => [m Result] -> [UniqueTask m]
+createTasks :: Monad m => [Task m] -> [UniqueTask m]
 createTasks = createTasksWithIds . zip [1..]
 
-createTasksWithIds :: Monad m => [(TaskId, m Result)] -> [UniqueTask m]
-createTasksWithIds = map (second Task)
+createTasksWithIds :: Monad m => [(TaskId, Task m)] -> [UniqueTask m]
+createTasksWithIds = id
 
 describeWorkshop :: Workshop m -> IO ()
 describeWorkshop w = do
