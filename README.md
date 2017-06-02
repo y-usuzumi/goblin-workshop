@@ -25,7 +25,7 @@
 1. 任务5开始；
 1. 任务5结束。
 
-一个简单输出的实现请参考[app/Samples/1.hs](app/Samples/1.hs)，执行结果如下：
+一个简单输出的实现请参考[app/Examples/1.hs](app/Examples/1.hs)，执行结果如下：
 
 ```
 /==========
@@ -74,6 +74,6 @@
 
 可将1.hs中的Logger输出等级修改为DEBUG查看更为细致的输出结果。
 
-另一个带终端图形界面的实现请参考[app/Samples/2.hs](app/Samples/2.hs)，执行效果如下：
+另一个带终端图形界面的实现请参考[app/Examples/2.hs](app/Examples/2.hs)，执行效果如下：
 
-![生成gif之后垃圾配色](app/Samples/2.gif)
+![生成gif之后垃圾配色](app/Examples/2.gif)
