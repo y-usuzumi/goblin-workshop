@@ -25,9 +25,7 @@ initGraph kvps conns = Graph { vertices
   (outEdgesMap, inEdgesMap) = foldl' reducer ( emptyEdgesMap
                                              , emptyEdgesMap
                                              ) conns
-  reducer (outEdges, inEdges) curr = let
-    start = fst curr
-    end = snd curr
+  reducer (outEdges, inEdges) (start, end) = let
     -- TODO: Check for existence of start and end
     outEdgesMap' = M.adjust ( \ existing ->
                                 reverse (end:reverse existing)
