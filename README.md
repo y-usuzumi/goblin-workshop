@@ -74,7 +74,8 @@
 
 可将1.hs中的Logger输出等级修改为DEBUG查看更为细致的输出结果。
 
-另一个带终端图形界面的实现请参考[app/Examples/2.hs](app/Examples/2.hs)，执行效果如下：
+另一个使用了终端图形界面的更加复杂的任务系统的实现请参考[app/Examples/2.hs](app/Examples/2.hs)，
+执行效果如下：
 
 ![生成gif之后垃圾配色](app/Examples/2.gif)
 

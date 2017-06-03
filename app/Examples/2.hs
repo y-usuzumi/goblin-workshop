@@ -25,6 +25,10 @@ tasks = createTasksWithIds [ (1, taskA)
                            , (3, taskC)
                            , (4, taskD)
                            , (5, taskE)
+                           , (6, taskF)
+                           , (7, taskG)
+                           , (8, taskH)
+                           , (9, taskI)
                            ]
   where
     taskX talk interval totalTime s = do
@@ -44,13 +48,22 @@ tasks = createTasksWithIds [ (1, taskA)
     taskC = TalkativeTask $ \talk -> taskX talk 0.1 10 "Task 3"
     taskD = TalkativeTask $ \talk -> taskX talk 0.1 6 "Task 4"
     taskE = TalkativeTask $ \talk -> taskX talk 0.1 2 "Task 5"
+    taskF = TalkativeTask $ \talk -> taskX talk 0.1 4 "Task 6"
+    taskG = TalkativeTask $ \talk -> taskX talk 0.1 12 "Task 7"
+    taskH = TalkativeTask $ \talk -> taskX talk 0.1 1 "Task 8"
+    taskI = TalkativeTask $ \talk -> taskX talk 0.1 3 "Task 9"
 
 dependencies :: [(TaskId, TaskId)]
 dependencies = [ (1, 3)
                , (2, 3)
+               , (2, 7)
                , (2, 4)
                , (3, 5)
                , (4, 5)
+               , (9, 6)
+               , (7, 6)
+               , (7, 8)
+               , (1, 9)
                ]
 
 data AppState = AppState { taskStates :: M.Map TaskId TaskState
@@ -164,7 +177,7 @@ main = do
                   , (allDoneAttr, GV.brightBlack `on` GV.brightGreen)
                   ]
                 }
-      taskStates = M.fromList $ take 5 $ zip [1..] $ repeat NotStarted
+      taskStates = M.fromList $ take (length tasks) $ zip [1..] $ repeat NotStarted
       initialState = AppState { taskStates, messages = [] }
   eventChan <- newBChan 100
   workshopChan <- atomically newWorkshopBus
