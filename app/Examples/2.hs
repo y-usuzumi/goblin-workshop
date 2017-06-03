@@ -95,13 +95,18 @@ drawUi s = let
       taskDescriptions <=> hBorder <=> (str $ unlines messages)
   where
     stateSummary AppState{..} = let
-      taskDescriptions = foldl1 (<=>) $ map describeState (M.assocs taskStates)
+      taskStateTuples = M.assocs taskStates
+      taskDescriptions = (foldl1 (<=>) $ map describeState $ taskStateTuples) <=> hBorder <=> describeTotalState taskStateTuples
       in
       (messages, taskDescriptions)
-    describeState (tid, s) = str (printf "Task %2d: " tid) <+> case s of
-      NotStarted       -> makeBar (0 :: Double)
-      Running progress -> makeBar progress
-      Done             -> makeBar (100 :: Double)
+    toProgress NotStarted = 0
+    toProgress (Running progress) = progress
+    toProgress Done = 100
+    describeState (tid, s) = str (printf "Task %2d: " tid) <+> (makeBar $ toProgress s)
+    describeTotalState taskStateTuples = str (printf "  Total: ") <+> let
+      taskProgresses = map (toProgress . snd) taskStateTuples
+      in
+      makeBar (sum taskProgresses / fromIntegral (length taskProgresses) :: Double)
     makeBar progress = let
       prog = realToFrac (progress / 100)
       in
