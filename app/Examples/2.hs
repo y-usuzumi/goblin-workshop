@@ -111,7 +111,7 @@ drawUi s = let
                     ) $ flip progressBar prog $ Just $
       if | prog == 0 -> "Waiting..."
          | prog == 1 -> "Done"
-         | otherwise -> printf "%.2f" progress
+         | otherwise -> printf "%.0f%%" progress
 
 eventHandler :: AppState -> BrickEvent n AppEvent -> EventM () (Next AppState)
 eventHandler s@AppState{..} e = case e of
