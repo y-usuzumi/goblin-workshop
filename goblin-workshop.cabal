@@ -26,15 +26,18 @@ library
   build-depends:       base >= 4.7 && < 5
                      , async
                      , containers
+                     , exceptions
                      , hslogger
                      , mtl
                      , stm
                      , vector
   default-language:    Haskell2010
-  default-extensions:  ExistentialQuantification
+  default-extensions:  DeriveAnyClass
+                     , ExistentialQuantification
                      , FlexibleInstances
                      , GADTs
                      , KindSignatures
+                     , LambdaCase
                      , MultiParamTypeClasses
                      , MultiWayIf
                      , NamedFieldPuns
@@ -42,7 +45,7 @@ library
                      , RankNTypes
                      , RecordWildCards
 
-executable goblin-workshop-sample-1
+executable goblin-workshop-example-1
   hs-source-dirs:      app/Examples
   main-is:             1.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
@@ -51,7 +54,7 @@ executable goblin-workshop-sample-1
                      , hslogger
   default-language:    Haskell2010
 
-executable goblin-workshop-sample-2
+executable goblin-workshop-example-2
   hs-source-dirs:      app/Examples
   main-is:             2.hs
   ghc-options:         -threaded -rtsopts -with-rtsopts=-N
