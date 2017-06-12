@@ -3,6 +3,7 @@ module Goblin.Workshop.Types where
 import           Control.Concurrent
 import           Control.Concurrent.STM
 import           Control.Monad
+import           Data.Dynamic
 import           Data.Either
 import           Goblin.Workshop.Graph
 import           System.Log.Logger
@@ -46,28 +47,29 @@ newtype Scheduler m =
 -- Task
 
 type TaskId = Int
-type UniqueTask m = (TaskId, Task m)
+type UniqueTask m e o = (TaskId, Task m e o)
 
 instance {-# OVERLAPPING #-} Eq (UniqueTask m) where
   a == b = fst a == fst b
 
-data Task m = Task (m Result)
-            | TalkativeTask ((TaskMessage -> m ()) -> m Result)
+data Task m e o where
+  Task :: (TaskError e, TaskOutput o)
+       => m (Result e o) -> Task m e o
+  TalkativeTask :: (TaskError e, TaskOutput o)
+                => ((TaskMessage e o -> m ()) -> m (Result e o)) -> Task m e o
 
-type Err = String
-type Ok = String
-type Result = Either Err Ok
+type Result e s = Either e s
 
-ok :: Ok -> Result
+ok :: s -> Result e s
 ok s = Right s
 
-err :: Err -> Result
-err s = Left s
+err :: e -> Result e s
+err e = Left e
 
-isOk :: Result -> Bool
+isOk :: Result e s -> Bool
 isOk = isRight
 
-isErr :: Result -> Bool
+isErr :: Result e s -> Bool
 isErr = isLeft
 
 -----------
@@ -90,26 +92,33 @@ data WTaskTalk = WTaskTalkProgress Progress
                | WTaskTalkOutput String
                deriving (Eq, Show)
 
-data DispatcherMessage m = DTaskDone TaskId Result
-                         | DTaskCanceled TaskId
-                         | DDebug String
+data DispatcherMessage m where
+  DTaskDone :: (TaskError e, TaskOutput o) => TaskId -> Result e o -> DispatcherMessage m
+  DTaskCanceled :: TaskId -> DispatcherMessage m
+  DDebug :: String -> DispatcherMessage m
 
-data SchedulerMessage m = SSpawnTask TaskId (Task m)
-                        | SKillTask TaskId
-                        | SQueryState TaskId
-                        | STaskDone TaskId Result
-                        | STaskError TaskId
-                        | STaskTalk TaskId STaskTalk
-                        | SDebug String
-                        | SFin
+data SchedulerMessage m e o where
+  SSpawnTask :: TaskId -> Task m e o -> SchedulerMessage m e o
+  SKillTask :: TaskId -> SchedulerMessage m e o
+  SQueryState :: TaskId -> SchedulerMessage m e o
+  STaskDone :: (TaskError e, TaskOutput o) => TaskId -> Result e o -> SchedulerMessage m e o
+  STaskError :: TaskId -> SchedulerMessage m e o
+  STaskTalk :: TaskId -> STaskTalk e o -> SchedulerMessage m e o
+  SDebug :: String -> SchedulerMessage m e o
+  SFin :: SchedulerMessage m e o
 
-data STaskTalk = STaskTalkProgress Progress
-               | STaskTalkOutput String
-               deriving (Eq, Show)
+class Typeable o => TaskOutput o
+class Typeable e => TaskError e
 
-data TaskMessage = TProgress Progress
-                 | TOutput String
-                 deriving (Eq, Show)
+data STaskTalk e o where
+  STaskTalkProgress :: Progress -> STaskTalk e o
+  STaskTalkOutput :: TaskOutput o => o -> STaskTalk e o
+  STaskTalkError :: TaskError e => e -> STaskTalk e o
+
+data TaskMessage e o where
+  TProgress :: Progress -> TaskMessage e o
+  TOutput :: o -> TaskMessage e o
+  deriving (Eq, Show)
 
 --------
 -- Buses

@@ -15,7 +15,7 @@ newWorkshopBus :: STM WorkshopBus
 newWorkshopBus = newTChan
 
 buildWorkshop :: Monad m
-              => [(TaskId, Task m)]
+              => [(TaskId, Task m e o)]
               -> [(TaskId, TaskId)]
               -> Workshop m
 buildWorkshop tasks dependencies = Workshop $ initGraph tasks dependencies
